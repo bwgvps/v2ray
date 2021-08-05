@@ -14,7 +14,7 @@ _qr_create() {
 	echo -e "$red 友情提醒: 请务必核对扫码结果 (V2RayNG 除外) $none"
 	echo
 	echo
-	echo " V2Ray 客户端使用教程: https://233v2.com/post/4/"
+	echo " V2Ray 客户端使用教程: https://github.com/bwgvps/v2ray-tutorial
 	echo
 	echo
 	rm -rf /etc/v2ray/vmess_qr.json

@@ -2124,7 +2124,7 @@ get_v2ray_config() {
 				echo
 				echo -e "${yellow} HTTP 监听端口 = ${cyan}6666$none"
 				echo
-				echo "V2Ray 客户端使用教程: https://233v2.com/post/4/"
+				echo "V2Ray 客户端使用教程: https://github.com/bwgvps/v2ray-tutorial"
 				echo
 				break
 			else
@@ -2230,7 +2230,7 @@ create_v2ray_config_text() {
 	fi
 	echo "---------- END -------------"
 	echo
-	echo "V2Ray 客户端使用教程: https://233v2.com/post/4/"
+	echo "V2Ray 客户端使用教程: https://github.com/bwgvps/v2ray-tutorial"
 	echo
 }
 get_v2ray_config_info_link() {
@@ -2246,7 +2246,7 @@ get_v2ray_config_info_link() {
 		echo
 		echo -e "$yellow 链接 = $cyan$link$none"
 		echo
-		echo -e " V2Ray 客户端使用教程: https://233v2.com/post/4/"
+		echo -e " V2Ray 客户端使用教程: https://github.com/bwgvps/v2ray-tutorial"
 		echo
 		echo "备注...链接将在 14 天后失效..."
 		echo
@@ -2278,7 +2278,7 @@ get_v2ray_vmess_URL_link() {
 	echo
 	echo -e ${cyan}$vmess${none}
 	echo
-	echo -e "${yellow}免被墙..推荐使用JMS: ${cyan}https://getjms.com${none}"
+	echo -e "${yellow}免被墙..推荐使用JMS: ${cyan}https://jms6.net${none}"
 	echo
 	rm -rf /etc/v2ray/vmess_qr.json
 }
@@ -2556,7 +2556,7 @@ do_service() {
 }
 _help() {
 	echo
-	echo "........... V2Ray 管理脚本帮助信息 by 233v2.com .........."
+	echo "........... V2Ray 管理脚本帮助信息 by https://bwgvps.github.io .........."
 	echo -e "
 	${green}v2ray menu $none管理 V2Ray (同等于直接输入 v2ray)
 
@@ -2597,19 +2597,12 @@ menu() {
 	clear
 	while :; do
 		echo
-		echo "........... V2Ray 管理脚本 $_version by 233v2.com .........."
+		echo "........... V2Ray 管理脚本 $_version by https://bwgvps.github.io .........."
 		echo
 		echo -e "## V2Ray 版本: $cyan$v2ray_ver$none  /  V2Ray 状态: $v2ray_status ##"
 		echo
-		echo "帮助说明: https://233v2.com/post/1/"
+		echo "帮助说明: https://github.com/bwgvps/v2ray/wiki"
 		echo
-		echo "反馈问题: https://github.com/233boy/v2ray/issues"
-		echo
-		echo "TG 频道: https://t.me/tg2333"
-		echo
-		echo "捐赠脚本作者: https://233v2.com/donate/"
-		echo
-		echo "捐助 V2Ray: https://www.v2ray.com/chapter_00/02_donate.html"
 		echo
 		echo -e "$yellow  1. $none查看 V2Ray 配置"
 		echo

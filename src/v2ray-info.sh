@@ -157,10 +157,10 @@ _v2_info() {
 	fi
 	echo "---------- END -------------"
 	echo
-	echo "V2Ray 客户端使用教程: https://233v2.com/post/4/"
+	echo "V2Ray 客户端使用教程: https://github.com/bwgvps/v2ray-tutorial"
 	echo
 	echo -e "提示: 输入 $cyan v2ray url $none 可生成 vmess URL 链接 / 输入 $cyan v2ray qr $none 可生成二维码链接"
 	echo
-	echo -e "${yellow}免被墙..推荐使用JMS: ${cyan}https://getjms.com${none}"
+	echo -e "${yellow}免被墙..推荐使用JMS: ${cyan}https://jms6.net${none}"
 	echo
 }
