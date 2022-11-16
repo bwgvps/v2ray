@@ -26,7 +26,7 @@ _download_v2ray_file() {
 	fi
 
 	unzip -o $v2ray_tmp_file -d "/usr/bin/v2ray/"
-	chmod +x /usr/bin/v2ray/{v2ray,v2ctl}
+	chmod +x /usr/bin/v2ray/v2ray
 	if [[ ! $(cat /root/.bashrc | grep v2ray) ]]; then
 		echo "alias v2ray=$_v2ray_sh" >>/root/.bashrc
 	fi
@@ -54,9 +54,12 @@ Environment="V2RAY_VMESS_AEAD_FORCED=false"
 #CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 #AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-ExecStart=/usr/bin/env v2ray.vmess.aead.forced=false /usr/bin/v2ray/v2ray -config /etc/v2ray/config.json
-#Restart=on-failure
-Restart=always
+ExecStart=/usr/bin/env v2ray.vmess.aead.forced=false /usr/bin/v2ray/v2ray run -config /etc/v2ray/config.json
+Restart=on-failure
+StartLimitBurst=0
+LimitNOFILE=1048576
+LimitNPROC=512
+#Restart=always
 
 [Install]
 WantedBy=multi-user.target
