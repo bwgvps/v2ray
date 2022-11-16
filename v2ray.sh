@@ -10,7 +10,7 @@ none='\e[0m'
 # Root
 [[ $(id -u) != 0 ]] && echo -e " 哎呀……请使用 ${red}root ${none}用户运行 ${yellow}~(^_^) ${none}" && exit 1
 
-_version="v3.52"
+_version="v3.67"
 
 cmd="apt-get"
 
@@ -84,16 +84,42 @@ v2ray_client_config="/etc/v2ray/233blog_v2ray_config.json"
 v2ray_pid=$(pgrep -f /usr/bin/v2ray/v2ray)
 caddy_pid=$(pgrep -f /usr/local/bin/caddy)
 _v2ray_sh="/usr/local/sbin/v2ray"
-v2ray_ver="$(/usr/bin/v2ray/v2ray -version | head -n 1 | cut -d " " -f2)"
+
+/usr/bin/v2ray/v2ray -version >/dev/null 2>&1
+if [[ $? == 0 ]]; then
+	v2ray_ver="$(/usr/bin/v2ray/v2ray -version | head -n 1 | cut -d " " -f2)"
+else
+	v2ray_ver="$(/usr/bin/v2ray/v2ray version | head -n 1 | cut -d " " -f2)"
+	v2ray_ver_v5=1
+fi
+
 . /etc/v2ray/233boy/v2ray/src/init.sh
 systemd=true
 # _test=true
 
 # fix VMessAEAD
-if [[ ! $(grep 'v2ray.vmess.aead.forced=false' /lib/systemd/system/v2ray.service) ]]; then
-	sed -i 's|ExecStart=|ExecStart=/usr/bin/env v2ray.vmess.aead.forced=false |' /lib/systemd/system/v2ray.service
+if [[ ! $(grep 'run -config' /lib/systemd/system/v2ray.service)  && $v2ray_ver_v5 ]]; then
+	_load download-v2ray.sh
+	_install_v2ray_service
 	systemctl daemon-reload
 	systemctl restart v2ray
+fi
+
+# fix caddy2 config
+if [[ $caddy ]]; then
+	/usr/local/bin/caddy version >/dev/null 2>&1
+	if [[ $? == 1 ]]; then
+		echo -e "\n $yellow 警告: 脚本将自动更新 Caddy 版本。 $none  \n"
+		systemctl stop caddy
+		_load download-caddy.sh
+		_download_caddy_file
+		_install_caddy_service
+		systemctl daemon-reload
+		_load caddy-config.sh
+		systemctl restart caddy
+		echo -e "\n $green 更新 Caddy 版本完成, 要是出问题了你可以重装解决。 $none  \n"
+		exit 0
+	fi
 fi
 
 if [[ $v2ray_ver != v* ]]; then
@@ -1737,18 +1763,18 @@ change_proxy_site_config() {
 }
 domain_check() {
 	# test_domain=$(dig $new_domain +short)
-	test_domain=$(ping $new_domain -c 1 -4 -W 2| grep -oE -m1 "([0-9]{1,3}\.){3}[0-9]{1,3}")
+	test_domain=$(ping $new_domain -c 1 -W 2 | head -1)
 	# test_domain=$(wget -qO- --header='accept: application/dns-json' "https://cloudflare-dns.com/dns-query?name=$new_domain&type=A" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | head -1)
 	# test_domain=$(curl -sH 'accept: application/dns-json' "https://cloudflare-dns.com/dns-query?name=$new_domain&type=A" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | head -1)
-	if [[ $test_domain != $ip ]]; then
+	if [[ ! $(echo $test_domain | grep $ip) ]]; then
 		echo
 		echo -e "$red 检测域名解析错误....$none"
 		echo
 		echo -e " 你的域名: $yellow$new_domain$none 未解析到: $cyan$ip$none"
 		echo
-		echo -e " 你的域名当前解析到: $cyan$test_domain$none"
+		echo -e " PING 测试结果: $cyan$test_domain$none"
 		echo
-		echo "备注...如果你的域名是使用 Cloudflare 解析的话..在 Status 那里点一下那图标..让它变灰"
+		echo "备注...如果你的域名是使用 Cloudflare 解析的话..在 DNS 那, 将 (Proxy status / 代理状态), 设置成 (DNS only / 仅限 DNS)"
 		echo
 		exit 1
 	fi
@@ -2508,15 +2534,17 @@ backup_config() {
 }
 
 get_ip() {
-	ip=$(curl -s https://ipinfo.io/ip)
-	[[ -z $ip ]] && ip=$(curl -s https://api.ip.sb/ip)
-	[[ -z $ip ]] && ip=$(curl -s https://api.ipify.org)
-	[[ -z $ip ]] && ip=$(curl -s https://ip.seeip.org)
-	[[ -z $ip ]] && ip=$(curl -s https://ifconfig.co/ip)
-	[[ -z $ip ]] && ip=$(curl -s https://api.myip.com | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
-	[[ -z $ip ]] && ip=$(curl -s icanhazip.com)
-	[[ -z $ip ]] && ip=$(curl -s myip.ipip.net | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
-	[[ -z $ip ]] && echo -e "\n$red 这垃圾小鸡扔了吧！$none\n" && exit
+	# ip=$(curl -s https://ipinfo.io/ip)
+	# [[ -z $ip ]] && ip=$(curl -s https://api.ip.sb/ip)
+	# [[ -z $ip ]] && ip=$(curl -s https://api.ipify.org)
+	# [[ -z $ip ]] && ip=$(curl -s https://ip.seeip.org)
+	# [[ -z $ip ]] && ip=$(curl -s https://ifconfig.co/ip)
+	# [[ -z $ip ]] && ip=$(curl -s https://api.myip.com | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
+	# [[ -z $ip ]] && ip=$(curl -s icanhazip.com)
+	# [[ -z $ip ]] && ip=$(curl -s myip.ipip.net | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
+	export "$(wget -4 -qO- https://dash.cloudflare.com/cdn-cgi/trace | grep ip=)" >/dev/null 2>&1
+	[[ -z $ip ]] && export "$(wget -6 -qO- https://dash.cloudflare.com/cdn-cgi/trace | grep ip=)" >/dev/null 2>&1
+	[[ -z $ip ]] && echo -e "\n$red 获取IP失败, 这垃圾小鸡扔了吧！$none\n" && exit
 }
 
 error() {
